@@ -1,14 +1,16 @@
 app_name = "two_of_us"
-app_title = "Two Of Us"
-app_publisher = "Ameer Muavia Shah"
-app_description = "Two of Us is a gamified intimacy app that helps couples grow closer through fun challenges, shared goals, and playful rewards."
-app_email = "mavee.shah@hotmail.com"
-app_license = "mit"
+app_title = "Two of Us"
+app_publisher = "Your Company"
+app_description = (
+    "A relationship app for couples to track challenges, goals, and achievements"
+)
+app_email = "support@yourcompany.com"
+app_license = "MIT"
 
-# Apps
-# ------------------
+# App includes
+app_include_css = ["/assets/two_of_us/css/two_of_us.css"]
 
-# required_apps = []
+app_include_js = ["/assets/two_of_us/js/two_of_us.js"]
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -21,8 +23,14 @@ app_license = "mit"
 # 	}
 # ]
 
-# Includes in <head>
-# ------------------
+# DocType includes
+doc_events = {
+    "Couple Profile": {
+        "on_update": "two_of_us.doctypes.couple_profile.couple_profile.on_update"
+    },
+    "Challenge": {"on_update": "two_of_us.doctypes.challenge.challenge.on_update"},
+    "Goal": {"on_update": "two_of_us.doctypes.goal.goal.on_update"},
+}
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/two_of_us/css/two_of_us.css"
@@ -112,10 +120,20 @@ app_license = "mit"
 # See frappe.core.notifications.get_notification_config
 
 # notification_config = "two_of_us.notifications.get_notification_config"
-
+# Fixtures
+fixtures = [
+    {
+        "doctype": "Custom Field",
+        "filters": [["dt", "in", ["Couple Profile", "Challenge", "Goal", "Reward"]]],
+    }
+]
 # Permissions
-# -----------
-# Permissions evaluated in scripted ways
+has_permission = {
+    "Couple Profile": "two_of_us.utils.has_permission",
+    "Challenge": "two_of_us.utils.has_permission",
+    "Goal": "two_of_us.utils.has_permission",
+    "Reward": "two_of_us.utils.has_permission",
+}
 
 # permission_query_conditions = {
 # 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
@@ -241,4 +259,12 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
+# Website routes
+website_route_rules = [
+    {"from_route": "/dashboard", "to_route": "two_of_us/dashboard"},
+    {"from_route": "/challenges", "to_route": "two_of_us/challenges"},
+    {"from_route": "/goals", "to_route": "two_of_us/goals"},
+    {"from_route": "/rewards", "to_route": "two_of_us/rewards"},
+    {"from_route": "/chat", "to_route": "two_of_us/chat"},
+    {"from_route": "/profile", "to_route": "two_of_us/profile"},
+]

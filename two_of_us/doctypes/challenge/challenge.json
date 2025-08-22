@@ -1,0 +1,151 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2024-01-01 00:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": "challenge_section,title,description,category,difficulty,points,status,date_section,start_date,end_date,progress,partners_section,partner1_name,partner1_avatar,partner2_name,partner2_avatar,completion_section,completed_date,completion_notes,points_earned",
+    "fields": [
+        {
+            "fieldname": "challenge_section",
+            "fieldtype": "Section Break",
+            "label": "Challenge Details"
+        },
+        {
+            "fieldname": "title",
+            "fieldtype": "Data",
+            "label": "Challenge Title",
+            "reqd": 1
+        },
+        {
+            "fieldname": "description",
+            "fieldtype": "Text",
+            "label": "Description",
+            "reqd": 1
+        },
+        {
+            "fieldname": "category",
+            "fieldtype": "Select",
+            "label": "Category",
+            "options": "Quality Time\nAdventure\nCommunication\nGrowth\nRomance\nFitness\nEntertainment\nLearning",
+            "reqd": 1
+        },
+        {
+            "fieldname": "difficulty",
+            "fieldtype": "Select",
+            "label": "Difficulty",
+            "options": "Easy\nMedium\nHard",
+            "reqd": 1
+        },
+        {
+            "fieldname": "points",
+            "fieldtype": "Int",
+            "label": "Points",
+            "reqd": 1,
+            "default": 10
+        },
+        {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "upcoming\nactive\ncompleted\ncancelled",
+            "reqd": 1,
+            "default": "upcoming"
+        },
+        {
+            "fieldname": "date_section",
+            "fieldtype": "Section Break",
+            "label": "Timeline"
+        },
+        {
+            "fieldname": "start_date",
+            "fieldtype": "Date",
+            "label": "Start Date",
+            "reqd": 1
+        },
+        {
+            "fieldname": "end_date",
+            "fieldtype": "Date",
+            "label": "End Date",
+            "reqd": 1
+        },
+        {
+            "fieldname": "progress",
+            "fieldtype": "Percent",
+            "label": "Progress",
+            "default": 0
+        },
+        {
+            "fieldname": "partners_section",
+            "fieldtype": "Section Break",
+            "label": "Partners"
+        },
+        {
+            "fieldname": "partner1_name",
+            "fieldtype": "Data",
+            "label": "Partner 1 Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "partner1_avatar",
+            "fieldtype": "Attach Image",
+            "label": "Partner 1 Avatar"
+        },
+        {
+            "fieldname": "partner2_name",
+            "fieldtype": "Data",
+            "label": "Partner 2 Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "partner2_avatar",
+            "fieldtype": "Attach Image",
+            "label": "Partner 2 Avatar"
+        },
+        {
+            "fieldname": "completion_section",
+            "fieldtype": "Section Break",
+            "label": "Completion"
+        },
+        {
+            "fieldname": "completed_date",
+            "fieldtype": "Date",
+            "label": "Completed Date"
+        },
+        {
+            "fieldname": "completion_notes",
+            "fieldtype": "Text",
+            "label": "Completion Notes"
+        },
+        {
+            "fieldname": "points_earned",
+            "fieldtype": "Int",
+            "label": "Points Earned"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2024-01-01 00:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Two of Us",
+    "name": "Challenge",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "track_changes": 1,
+    "track_views": 1
+}

@@ -1,0 +1,116 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2024-01-01 00:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": "reward_section,title,description,points_required,category,status,partners_section,partner1_name,partner1_avatar,partner2_name,partner2_avatar,unlock_section,unlocked_date,unlock_notes",
+    "fields": [
+        {
+            "fieldname": "reward_section",
+            "fieldtype": "Section Break",
+            "label": "Reward Details"
+        },
+        {
+            "fieldname": "title",
+            "fieldtype": "Data",
+            "label": "Reward Title",
+            "reqd": 1
+        },
+        {
+            "fieldname": "description",
+            "fieldtype": "Text",
+            "label": "Description",
+            "reqd": 1
+        },
+        {
+            "fieldname": "points_required",
+            "fieldtype": "Int",
+            "label": "Points Required",
+            "reqd": 1,
+            "default": 100
+        },
+        {
+            "fieldname": "category",
+            "fieldtype": "Select",
+            "label": "Category",
+            "options": "Entertainment\nWellness\nAdventure\nDining\nShopping\nRomance\nExperience\nGift",
+            "reqd": 1
+        },
+        {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "locked\navailable\nunlocked",
+            "reqd": 1,
+            "default": "locked"
+        },
+        {
+            "fieldname": "partners_section",
+            "fieldtype": "Section Break",
+            "label": "Partners"
+        },
+        {
+            "fieldname": "partner1_name",
+            "fieldtype": "Data",
+            "label": "Partner 1 Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "partner1_avatar",
+            "fieldtype": "Attach Image",
+            "label": "Partner 1 Avatar"
+        },
+        {
+            "fieldname": "partner2_name",
+            "fieldtype": "Data",
+            "label": "Partner 2 Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "partner2_avatar",
+            "fieldtype": "Attach Image",
+            "label": "Partner 2 Avatar"
+        },
+        {
+            "fieldname": "unlock_section",
+            "fieldtype": "Section Break",
+            "label": "Unlock Details"
+        },
+        {
+            "fieldname": "unlocked_date",
+            "fieldtype": "Date",
+            "label": "Unlocked Date"
+        },
+        {
+            "fieldname": "unlock_notes",
+            "fieldtype": "Text",
+            "label": "Unlock Notes"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2024-01-01 00:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Two of Us",
+    "name": "Reward",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "track_changes": 1,
+    "track_views": 1
+}
