@@ -1,21 +1,35 @@
-// Frappe API service for Two of Us app
-const FRAPPE_API_BASE = '/api/method/two_of_us.api';
+// Frappe API Service for Two of Us App
+const FRAPPE_URL = window.location.origin; // Automatically detect Frappe URL
 
-class FrappeApiService {
+class FrappeAPI {
     constructor() {
-        this.baseUrl = FRAPPE_API_BASE;
+        this.baseURL = FRAPPE_URL;
+        this.csrfToken = this.getCSRFToken();
     }
 
-    // Generic method to call Frappe API
-    async callApi(method, params = {}) {
+    // Get CSRF token from cookies
+    getCSRFToken() {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrf_token') {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    // Generic method to call Frappe methods
+    async call(method, args = {}) {
         try {
-            const response = await fetch(`${this.baseUrl}.${method}`, {
+            const response = await fetch(`${this.baseURL}/api/method/${method}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Frappe-CSRF-Token': this.getCsrfToken(),
+                    'X-Frappe-CSRF-Token': this.csrfToken,
                 },
-                body: JSON.stringify(params),
+                body: JSON.stringify(args),
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -23,134 +37,211 @@ class FrappeApiService {
             }
 
             const data = await response.json();
-
-            if (data.message && data.message.error) {
-                throw new Error(data.message.error);
-            }
-
             return data.message || data;
         } catch (error) {
-            console.error(`API Error in ${method}:`, error);
+            console.error('Frappe API Error:', error);
             throw error;
         }
     }
 
-    // Get CSRF token from meta tag
-    getCsrfToken() {
-        const metaTag = document.querySelector('meta[name="csrf-token"]');
-        return metaTag ? metaTag.getAttribute('content') : '';
-    }
-
-    // Dashboard API calls
-    async getDashboardData(partner1Name, partner2Name) {
-        return this.callApi('get_dashboard_data', {
-            partner1_name: partner1Name,
-            partner2_name: partner2Name
-        });
-    }
-
-    // Challenges API calls
-    async getChallenges(partner1Name, partner2Name, status = null) {
-        return this.callApi('get_challenges_list', {
-            partner1_name: partner1Name,
-            partner2_name: partner2Name,
-            status: status
-        });
-    }
-
-    async createChallenge(challengeData) {
-        return this.callApi('create_challenge', challengeData);
-    }
-
-    async completeChallenge(challengeName, completionNotes = '') {
-        return this.callApi('complete_challenge', {
-            challenge_name: challengeName,
-            completion_notes: completionNotes
-        });
-    }
-
-    // Goals API calls
-    async getGoals(partner1Name, partner2Name, status = null) {
-        return this.callApi('get_goals_list', {
-            partner1_name: partner1Name,
-            partner2_name: partner2Name,
-            status: status
-        });
-    }
-
-    async createGoal(goalData) {
-        return this.callApi('create_goal', goalData);
-    }
-
-    async updateGoalProgress(goalName, progress) {
-        return this.callApi('update_goal_progress', {
-            goal_name: goalName,
-            progress: progress
-        });
-    }
-
-    // Rewards API calls
-    async getRewards(partner1Name, partner2Name) {
-        return this.callApi('get_rewards_list', {
-            partner1_name: partner1Name,
-            partner2_name: partner2Name
-        });
-    }
-
-    async unlockReward(rewardName, partner1Name, partner2Name) {
-        return this.callApi('unlock_reward', {
-            reward_name: rewardName,
-            partner1_name: partner1Name,
-            partner2_name: partner2Name
-        });
-    }
-
-    // Chat API calls
-    async getChatMessages(partner1Name, partner2Name, limit = 50) {
-        return this.callApi('get_chat_messages', {
-            partner1_name: partner1Name,
-            partner2_name: partner2Name,
-            limit: limit
-        });
-    }
-
-    async sendChatMessage(text, senderName, partner1Name, partner2Name, messageType = 'text') {
-        return this.callApi('send_chat_message', {
-            text: text,
-            sender_name: senderName,
-            partner1_name: partner1Name,
-            partner2_name: partner2Name,
-            message_type: messageType
-        });
-    }
-
-    // Achievements API calls
-    async getAchievements(partner1Name, partner2Name) {
-        return this.callApi('get_achievements', {
-            partner1_name: partner1Name,
-            partner2_name: partner2Name
-        });
-    }
-
-    // Couple Profile API calls
-    async createCoupleProfile(partner1Name, partner1Email, partner2Name, partner2Email, anniversaryDate) {
-        return this.callApi('create_couple_profile', {
-            partner1_name: partner1Name,
-            partner1_email: partner1Email,
-            partner2_name: partner2Name,
-            partner2_email: partner2Email,
-            anniversary_date: anniversaryDate
-        });
-    }
-
+    // Get couple profile
     async getCoupleProfile(partner1Name, partner2Name) {
-        return this.callApi('get_couple_profile', {
-            partner1_name: partner1Name,
-            partner2_name: partner2Name
-        });
+        try {
+            const profiles = await this.call('frappe.client.get_list', {
+                doctype: 'Couple Profile',
+                filters: {
+                    partner1_name: partner1Name,
+                    partner2_name: partner2Name
+                },
+                limit: 1
+            });
+            return profiles.length > 0 ? profiles[0] : null;
+        } catch (error) {
+            console.error('Error fetching couple profile:', error);
+            return null;
+        }
+    }
+
+    // Get challenges
+    async getChallenges(partner1Name, partner2Name) {
+        try {
+            return await this.call('frappe.client.get_list', {
+                doctype: 'Challenge',
+                filters: {
+                    partner1_name: partner1Name,
+                    partner2_name: partner2Name
+                },
+                fields: ['*'],
+                order_by: 'creation desc'
+            });
+        } catch (error) {
+            console.error('Error fetching challenges:', error);
+            return [];
+        }
+    }
+
+    // Get goals
+    async getGoals(partner1Name, partner2Name) {
+        try {
+            return await this.call('frappe.client.get_list', {
+                doctype: 'Goal',
+                filters: {
+                    partner1_name: partner1Name,
+                    partner2_name: partner2Name
+                },
+                fields: ['*'],
+                order_by: 'creation desc'
+            });
+        } catch (error) {
+            console.error('Error fetching goals:', error);
+            return [];
+        }
+    }
+
+    // Get rewards
+    async getRewards(partner1Name, partner2Name) {
+        try {
+            return await this.call('frappe.client.get_list', {
+                doctype: 'Reward',
+                filters: {
+                    partner1_name: partner1Name,
+                    partner2_name: partner2Name
+                },
+                fields: ['*'],
+                order_by: 'creation desc'
+            });
+        } catch (error) {
+            console.error('Error fetching rewards:', error);
+            return [];
+        }
+    }
+
+    // Get achievements
+    async getAchievements(partner1Name, partner2Name) {
+        try {
+            return await this.call('frappe.client.get_list', {
+                doctype: 'Achievement',
+                filters: {
+                    partner1_name: partner1Name,
+                    partner2_name: partner2Name
+                },
+                fields: ['*'],
+                order_by: 'earned_date desc'
+            });
+        } catch (error) {
+            console.error('Error fetching achievements:', error);
+            return [];
+        }
+    }
+
+    // Get chat messages
+    async getChatMessages(partner1Name, partner2Name, limit = 50) {
+        try {
+            return await this.call('frappe.client.get_list', {
+                doctype: 'Chat Message',
+                filters: {
+                    partner1_name: partner1Name,
+                    partner2_name: partner2Name
+                },
+                fields: ['*'],
+                order_by: 'timestamp desc',
+                limit: limit
+            });
+        } catch (error) {
+            console.error('Error fetching chat messages:', error);
+            return [];
+        }
+    }
+
+    // Create new challenge
+    async createChallenge(challengeData) {
+        try {
+            return await this.call('frappe.client.insert', {
+                doc: {
+                    doctype: 'Challenge',
+                    ...challengeData
+                }
+            });
+        } catch (error) {
+            console.error('Error creating challenge:', error);
+            throw error;
+        }
+    }
+
+    // Create new goal
+    async createGoal(goalData) {
+        try {
+            return await this.call('frappe.client.insert', {
+                doc: {
+                    doctype: 'Goal',
+                    ...goalData
+                }
+            });
+        } catch (error) {
+            console.error('Error creating goal:', error);
+            throw error;
+        }
+    }
+
+    // Update challenge status
+    async updateChallengeStatus(challengeName, status) {
+        try {
+            return await this.call('frappe.client.set_value', {
+                doctype: 'Challenge',
+                name: challengeName,
+                fieldname: 'status',
+                value: status
+            });
+        } catch (error) {
+            console.error('Error updating challenge status:', error);
+            throw error;
+        }
+    }
+
+    // Update goal progress
+    async updateGoalProgress(goalName, progress) {
+        try {
+            return await this.call('frappe.client.set_value', {
+                doctype: 'Goal',
+                name: goalName,
+                fieldname: 'progress',
+                value: progress
+            });
+        } catch (error) {
+            console.error('Error updating goal progress:', error);
+            throw error;
+        }
+    }
+
+    // Send chat message
+    async sendChatMessage(messageData) {
+        try {
+            return await this.call('frappe.client.insert', {
+                doc: {
+                    doctype: 'Chat Message',
+                    ...messageData
+                }
+            });
+        } catch (error) {
+            console.error('Error sending chat message:', error);
+            throw error;
+        }
+    }
+
+    // Get current user info
+    async getCurrentUser() {
+        try {
+            return await this.call('frappe.auth.get_logged_user');
+        } catch (error) {
+            console.error('Error getting current user:', error);
+            return null;
+        }
+    }
+
+    // Check if user is logged in
+    isLoggedIn() {
+        return this.csrfToken !== null;
     }
 }
 
-// Create and export a singleton instance
-const frappeApi = new FrappeApiService();
-export default frappeApi;
+export default new FrappeAPI();

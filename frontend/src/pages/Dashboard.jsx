@@ -1,41 +1,95 @@
 import React from 'react'
-import { Row, Col, Card, Statistic, Progress, Button, Avatar, Typography, Space } from 'antd'
+import { Row, Col, Card, Statistic, Progress, Button, Avatar, Typography, Space, Spin, Alert, Tag } from 'antd'
 import {
     HeartOutlined,
     TrophyOutlined,
     FlagOutlined,
     GiftOutlined,
     FireOutlined,
-    StarOutlined
+    StarOutlined,
+    PlusOutlined
 } from '@ant-design/icons'
 import { motion } from 'framer-motion'
+import { useCouple } from '../context/CoupleContext'
 
 const { Title, Text, Paragraph } = Typography
 
 const Dashboard = () => {
-    // Mock data - in real app this would come from API
-    const coupleData = {
-        relationshipScore: 750,
-        relationshipDuration: 365,
-        totalChallenges: 45,
-        completedChallenges: 38,
-        totalGoals: 12,
-        achievedGoals: 8,
-        currentStreak: 7,
-        partnerName: 'Sarah',
-        partnerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
+    const {
+        coupleProfile,
+        challenges,
+        goals,
+        rewards,
+        achievements,
+        loading,
+        error,
+        partnerNames,
+        createChallenge,
+        createGoal
+    } = useCouple();
+
+    // Calculate statistics from real data
+    const stats = {
+        relationshipScore: coupleProfile?.relationship_score || 0,
+        relationshipDuration: coupleProfile?.relationship_duration || 0,
+        totalChallenges: challenges.length,
+        completedChallenges: challenges.filter(c => c.status === 'completed').length,
+        totalGoals: goals.length,
+        achievedGoals: goals.filter(g => g.status === 'achieved').length,
+        currentStreak: coupleProfile?.current_streak || 0,
+        partnerName: partnerNames.partner2,
+        partnerAvatar: coupleProfile?.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${partnerNames.partner2}`
+    };
+
+    // Get recent challenges (last 3)
+    const recentChallenges = challenges
+        .slice(0, 3)
+        .map(c => ({
+            id: c.name,
+            title: c.title,
+            status: c.status,
+            points: c.points,
+            description: c.description
+        }));
+
+    // Get upcoming goals (not achieved)
+    const upcomingGoals = goals
+        .filter(g => g.status !== 'achieved')
+        .slice(0, 2)
+        .map(g => ({
+            id: g.name,
+            title: g.title,
+            progress: g.progress || 0,
+            target: g.target_date,
+            description: g.description
+        }));
+
+    if (loading) {
+        return (
+            <div style={{ marginLeft: '250px', padding: '24px', textAlign: 'center' }}>
+                <Spin size="large" />
+                <Text>Loading your relationship data...</Text>
+            </div>
+        );
     }
 
-    const recentChallenges = [
-        { id: 1, title: 'Cook dinner together', status: 'completed', points: 15 },
-        { id: 2, title: 'Plan weekend getaway', status: 'active', points: 25 },
-        { id: 3, title: 'Share daily gratitude', status: 'active', points: 10 }
-    ]
-
-    const upcomingGoals = [
-        { id: 1, title: 'Save for vacation', progress: 65, target: '2024-06-01' },
-        { id: 2, title: 'Improve communication', progress: 40, target: '2024-05-15' }
-    ]
+    if (error) {
+        return (
+            <div style={{ marginLeft: '250px', padding: '24px' }}>
+                <Alert
+                    message="Error Loading Data"
+                    description={error}
+                    type="error"
+                    showIcon
+                    action={
+                        <Button size="small" onClick={() => window.location.reload()}>
+                            Retry
+                        </Button>
+                    }
+                />
+            </div>
+        );
+    }
 
     return (
         <div style={{ marginLeft: '250px', padding: '24px' }}>
@@ -54,7 +108,7 @@ const Dashboard = () => {
                         <Card className="hover-card" style={{ textAlign: 'center' }}>
                             <Statistic
                                 title="Relationship Score"
-                                value={coupleData.relationshipScore}
+                                value={stats.relationshipScore}
                                 prefix={<HeartOutlined style={{ color: '#ff6b9d' }} />}
                                 valueStyle={{ color: '#ff6b9d', fontSize: '24px' }}
                             />
@@ -64,7 +118,7 @@ const Dashboard = () => {
                         <Card className="hover-card" style={{ textAlign: 'center' }}>
                             <Statistic
                                 title="Days Together"
-                                value={coupleData.relationshipDuration}
+                                value={stats.relationshipDuration}
                                 prefix={<StarOutlined style={{ color: '#52c41a' }} />}
                                 valueStyle={{ color: '#52c41a', fontSize: '24px' }}
                             />
@@ -74,7 +128,7 @@ const Dashboard = () => {
                         <Card className="hover-card" style={{ textAlign: 'center' }}>
                             <Statistic
                                 title="Current Streak"
-                                value={coupleData.currentStreak}
+                                value={stats.currentStreak}
                                 prefix={<FireOutlined style={{ color: '#fa8c16' }} />}
                                 valueStyle={{ color: '#fa8c16', fontSize: '24px' }}
                             />
@@ -84,7 +138,7 @@ const Dashboard = () => {
                         <Card className="hover-card" style={{ textAlign: 'center' }}>
                             <Statistic
                                 title="Completed Challenges"
-                                value={coupleData.completedChallenges}
+                                value={stats.completedChallenges}
                                 prefix={<TrophyOutlined style={{ color: '#1890ff' }} />}
                                 valueStyle={{ color: '#1890ff', fontSize: '24px' }}
                             />
@@ -98,121 +152,134 @@ const Dashboard = () => {
                     <Col xs={24} lg={16}>
                         {/* Partner Section */}
                         <Card
-                            title={
-                                <Space>
-                                    <Avatar size={40} src={coupleData.partnerAvatar} />
-                                    <span>Your Partner: {coupleData.partnerName}</span>
-                                </Space>
-                            }
                             className="hover-card"
                             style={{ marginBottom: '24px' }}
+                            title={
+                                <Space>
+                                    <Avatar size={48} src={stats.partnerAvatar} />
+                                    <div>
+                                        <Title level={4} style={{ margin: 0 }}>
+                                            {stats.partnerName}
+                                        </Title>
+                                        <Text type="secondary">
+                                            {coupleProfile?.relationship_status || 'Dating'}
+                                        </Text>
+                                    </div>
+                                </Space>
+                            }
                         >
-                            <Row gutter={[16, 16]}>
-                                <Col span={12}>
-                                    <Text strong>Challenges Progress</Text>
-                                    <Progress
-                                        percent={Math.round((coupleData.completedChallenges / coupleData.totalChallenges) * 100)}
-                                        status="active"
-                                        strokeColor="#ff6b9d"
-                                    />
-                                </Col>
-                                <Col span={12}>
-                                    <Text strong>Goals Progress</Text>
-                                    <Progress
-                                        percent={Math.round((coupleData.achievedGoals / coupleData.totalGoals) * 100)}
-                                        status="active"
-                                        strokeColor="#52c41a"
-                                    />
-                                </Col>
-                            </Row>
+                            <Paragraph>
+                                {coupleProfile?.description || 'Your relationship journey together...'}
+                            </Paragraph>
                         </Card>
 
                         {/* Recent Challenges */}
                         <Card
-                            title="Recent Challenges"
-                            extra={<Button type="link" style={{ color: '#ff6b9d' }}>View All</Button>}
                             className="hover-card"
+                            title={
+                                <Space>
+                                    <FlagOutlined />
+                                    Recent Challenges
+                                </Space>
+                            }
+                            extra={
+                                <Button type="primary" icon={<PlusOutlined />} size="small">
+                                    Add Challenge
+                                </Button>
+                            }
+                            style={{ marginBottom: '24px' }}
                         >
-                            {recentChallenges.map(challenge => (
-                                <div key={challenge.id} style={{
-                                    padding: '12px 0',
-                                    borderBottom: '1px solid #f0f0f0',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                }}>
-                                    <div>
-                                        <Text strong>{challenge.title}</Text>
-                                        <br />
-                                        <Text type="secondary">{challenge.points} points</Text>
+                            {recentChallenges.length > 0 ? (
+                                recentChallenges.map(challenge => (
+                                    <div key={challenge.id} style={{ marginBottom: '16px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div>
+                                                <Text strong>{challenge.title}</Text>
+                                                <br />
+                                                <Text type="secondary" style={{ fontSize: '12px' }}>
+                                                    {challenge.description}
+                                                </Text>
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <Tag color={
+                                                    challenge.status === 'completed' ? 'success' :
+                                                    challenge.status === 'active' ? 'processing' : 'default'
+                                                }>
+                                                    {challenge.status}
+                                                </Tag>
+                                                <br />
+                                                <Text type="secondary">{challenge.points} pts</Text>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <Button
-                                        type={challenge.status === 'completed' ? 'default' : 'primary'}
-                                        size="small"
-                                        style={{
-                                            backgroundColor: challenge.status === 'completed' ? '#52c41a' : '#ff6b9d',
-                                            borderColor: challenge.status === 'completed' ? '#52c41a' : '#ff6b9d'
-                                        }}
-                                    >
-                                        {challenge.status === 'completed' ? 'Completed' : 'Active'}
-                                    </Button>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <Text type="secondary">No challenges yet. Create your first one!</Text>
+                            )}
                         </Card>
                     </Col>
 
                     {/* Right Column */}
                     <Col xs={24} lg={8}>
-                        {/* Quick Actions */}
-                        <Card title="Quick Actions" className="hover-card" style={{ marginBottom: '24px' }}>
-                            <Space direction="vertical" style={{ width: '100%' }}>
-                                <Button
-                                    type="primary"
-                                    block
-                                    icon={<TrophyOutlined />}
-                                    style={{ backgroundColor: '#ff6b9d', borderColor: '#ff6b9d' }}
-                                >
-                                    Start New Challenge
+                        {/* Upcoming Goals */}
+                        <Card
+                            className="hover-card"
+                            title={
+                                <Space>
+                                    <GiftOutlined />
+                                    Upcoming Goals
+                                </Space>
+                            }
+                            extra={
+                                <Button type="primary" icon={<PlusOutlined />} size="small">
+                                    Add Goal
                                 </Button>
-                                <Button
-                                    block
-                                    icon={<FlagOutlined />}
-                                    style={{ borderColor: '#52c41a', color: '#52c41a' }}
-                                >
-                                    Set New Goal
-                                </Button>
-                                <Button
-                                    block
-                                    icon={<GiftOutlined />}
-                                    style={{ borderColor: '#fa8c16', color: '#fa8c16' }}
-                                >
-                                    View Rewards
-                                </Button>
-                            </Space>
+                            }
+                            style={{ marginBottom: '24px' }}
+                        >
+                            {upcomingGoals.length > 0 ? (
+                                upcomingGoals.map(goal => (
+                                    <div key={goal.id} style={{ marginBottom: '16px' }}>
+                                        <div style={{ marginBottom: '8px' }}>
+                                            <Text strong>{goal.title}</Text>
+                                        </div>
+                                        <Progress
+                                            percent={goal.progress}
+                                            size="small"
+                                            status={goal.progress === 100 ? 'success' : 'active'}
+                                        />
+                                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                                            Target: {goal.target}
+                                        </Text>
+                                    </div>
+                                ))
+                            ) : (
+                                <Text type="secondary">No goals yet. Set your first goal!</Text>
+                            )}
                         </Card>
 
-                        {/* Upcoming Goals */}
-                        <Card title="Upcoming Goals" className="hover-card">
-                            {upcomingGoals.map(goal => (
-                                <div key={goal.id} style={{ marginBottom: '16px' }}>
-                                    <Text strong>{goal.title}</Text>
-                                    <Progress
-                                        percent={goal.progress}
-                                        size="small"
-                                        strokeColor="#52c41a"
-                                        style={{ marginTop: '8px' }}
-                                    />
-                                    <Text type="secondary" style={{ fontSize: '12px' }}>
-                                        Target: {goal.target}
-                                    </Text>
-                                </div>
-                            ))}
+                        {/* Quick Actions */}
+                        <Card
+                            className="hover-card"
+                            title="Quick Actions"
+                        >
+                            <Space direction="vertical" style={{ width: '100%' }}>
+                                <Button type="primary" block icon={<PlusOutlined />}>
+                                    New Challenge
+                                </Button>
+                                <Button block icon={<PlusOutlined />}>
+                                    New Goal
+                                </Button>
+                                <Button block icon={<PlusOutlined />}>
+                                    Send Message
+                                </Button>
+                            </Space>
                         </Card>
                     </Col>
                 </Row>
             </motion.div>
         </div>
-    )
-}
+    );
+};
 
-export default Dashboard
+export default Dashboard;
