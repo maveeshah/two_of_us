@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Hooks for Two of Us App
+"""
+
+# App metadata
 app_name = "two_of_us"
 app_title = "Two of Us"
-app_publisher = "Your Company"
-app_description = (
-    "A relationship app for couples to track challenges, goals, and achievements"
-)
-app_email = "support@yourcompany.com"
+app_publisher = "Ameer Muavia Shah"
+app_description = "A relationship management app for couples"
+app_email = "mavee.shah@hotmail.com"
 app_license = "MIT"
 
 # App includes
@@ -23,14 +27,15 @@ app_include_js = ["/assets/two_of_us/js/two_of_us.js"]
 # 	}
 # ]
 
-# DocType includes
+# Doc Events
 doc_events = {
-    "Couple Profile": {
-        "on_update": "two_of_us.doctypes.couple_profile.couple_profile.on_update"
-    },
-    "Challenge": {"on_update": "two_of_us.doctypes.challenge.challenge.on_update"},
-    "Goal": {"on_update": "two_of_us.doctypes.goal.goal.on_update"},
+    "Couple Profile": {"on_update": "two_of_us.utils.update_couple_statistics"},
+    "Challenge": {"on_update": "two_of_us.utils.update_couple_profile"},
+    "Goal": {"on_update": "two_of_us.utils.update_couple_profile"},
 }
+
+# After Migrate Hook
+after_migrate = "two_of_us.cleanup_demo.after_migrate"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/two_of_us/css/two_of_us.css"
@@ -121,18 +126,15 @@ doc_events = {
 
 # notification_config = "two_of_us.notifications.get_notification_config"
 # Fixtures
-fixtures = [
-    {
-        "doctype": "Custom Field",
-        "filters": [["dt", "in", ["Couple Profile", "Challenge", "Goal", "Reward"]]],
-    }
-]
+fixtures = [{"doctype": "Custom Field", "filters": [["app_name", "=", "two_of_us"]]}]
 # Permissions
 has_permission = {
     "Couple Profile": "two_of_us.utils.has_permission",
     "Challenge": "two_of_us.utils.has_permission",
     "Goal": "two_of_us.utils.has_permission",
     "Reward": "two_of_us.utils.has_permission",
+    "Achievement": "two_of_us.utils.has_permission",
+    "Chat Message": "two_of_us.utils.has_permission",
 }
 
 # permission_query_conditions = {
@@ -269,4 +271,6 @@ website_route_rules = [
     {"from_route": "/profile", "to_route": "two_of_us/profile"},
 ]
 
-website_route_rules = [{'from_route': '/frontend/<path:app_path>', 'to_route': 'frontend'},]
+website_route_rules = [
+    {"from_route": "/frontend/<path:app_path>", "to_route": "frontend"},
+]
