@@ -1,0 +1,23 @@
+{
+  "name": "two_of_us",
+  "version": "1.0.0",
+  "description": "Two of Us is a gamified intimacy app that helps couples grow closer through fun challenges, shared goals, and playful rewards.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd frontend && yarn install",
+    "dev": "cd frontend && yarn dev",
+    "build": "cd frontend && yarn build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maveeshah/two_of_us.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maveeshah/two_of_us/issues"
+  },
+  "homepage": "https://github.com/maveeshah/two_of_us#readme"
+}

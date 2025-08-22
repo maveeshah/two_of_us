@@ -1,35 +1,162 @@
 {
- "actions": [],
- "allow_rename": 1,
- "creation": "2025-08-22 16:46:58.330896",
- "doctype": "DocType",
- "engine": "InnoDB",
- "field_order": [],
- "fields": [],
- "grid_page_length": 50,
- "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2025-08-22 16:47:32.251253",
- "modified_by": "Administrator",
- "module": "Two of Us",
- "name": "Couple Profile",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
- "row_format": "Dynamic",
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2025-08-22 16:46:58.330896",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "partner1_name",
+        "partner1_email",
+        "partner2_name",
+        "partner2_email",
+        "anniversary_date",
+        "relationship_status",
+        "relationship_score",
+        "relationship_level",
+        "relationship_duration",
+        "total_challenges",
+        "completed_challenges",
+        "total_goals",
+        "achieved_goals",
+        "total_points",
+        "achievements_count",
+        "profile_picture",
+        "description"
+    ],
+    "fields": [
+        {
+            "fieldname": "partner1_name",
+            "fieldtype": "Data",
+            "label": "Partner 1 Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "partner1_email",
+            "fieldtype": "Email",
+            "label": "Partner 1 Email",
+            "reqd": 1
+        },
+        {
+            "fieldname": "partner2_name",
+            "fieldtype": "Data",
+            "label": "Partner 2 Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "partner2_email",
+            "fieldtype": "Email",
+            "label": "Partner 2 Email",
+            "reqd": 1
+        },
+        {
+            "fieldname": "anniversary_date",
+            "fieldtype": "Date",
+            "label": "Anniversary Date"
+        },
+        {
+            "fieldname": "relationship_status",
+            "fieldtype": "Select",
+            "label": "Relationship Status",
+            "options": "Dating\nEngaged\nMarried\nLong-term",
+            "default": "Dating"
+        },
+        {
+            "fieldname": "relationship_score",
+            "fieldtype": "Int",
+            "label": "Relationship Score",
+            "default": 0,
+            "read_only": 1
+        },
+        {
+            "fieldname": "relationship_level",
+            "fieldtype": "Data",
+            "label": "Relationship Level",
+            "default": "New Couple",
+            "read_only": 1
+        },
+        {
+            "fieldname": "relationship_duration",
+            "fieldtype": "Int",
+            "label": "Relationship Duration (Days)",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_challenges",
+            "fieldtype": "Int",
+            "label": "Total Challenges",
+            "default": 0,
+            "read_only": 1
+        },
+        {
+            "fieldname": "completed_challenges",
+            "fieldtype": "Int",
+            "label": "Completed Challenges",
+            "default": 0,
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_goals",
+            "fieldtype": "Int",
+            "label": "Total Goals",
+            "default": 0,
+            "read_only": 1
+        },
+        {
+            "fieldname": "achieved_goals",
+            "fieldtype": "Int",
+            "label": "Achieved Goals",
+            "default": 0,
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_points",
+            "fieldtype": "Int",
+            "label": "Total Points",
+            "default": 0,
+            "read_only": 1
+        },
+        {
+            "fieldname": "achievements_count",
+            "fieldtype": "Int",
+            "label": "Achievements Count",
+            "default": 0,
+            "read_only": 1
+        },
+        {
+            "fieldname": "profile_picture",
+            "fieldtype": "Attach Image",
+            "label": "Profile Picture"
+        },
+        {
+            "fieldname": "description",
+            "fieldtype": "Text",
+            "label": "Description"
+        }
+    ],
+    "grid_page_length": 50,
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2025-08-22 16:47:32.251253",
+    "modified_by": "Administrator",
+    "module": "Two of Us",
+    "name": "Couple Profile",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "row_format": "Dynamic",
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
 }

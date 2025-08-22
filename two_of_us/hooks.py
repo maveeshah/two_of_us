@@ -268,3 +268,5 @@ website_route_rules = [
     {"from_route": "/chat", "to_route": "two_of_us/chat"},
     {"from_route": "/profile", "to_route": "two_of_us/profile"},
 ]
+
+website_route_rules = [{'from_route': '/frontend/<path:app_path>', 'to_route': 'frontend'},]
